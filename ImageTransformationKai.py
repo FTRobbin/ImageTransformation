@@ -31,7 +31,7 @@ def main(args):
                 img = Image.open(os.path.join(args.image_dir, f))
                 out_file = os.path.join(args.output_image_dir, fname + '.' + args.output_type)
                 if args.transformation == 1:
-                    oh, ow = img.size
+                    ow, oh = img.size
                     if alpha >= 0:
                         xs = 0
                         xe = oh - alpha
