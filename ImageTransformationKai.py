@@ -28,8 +28,14 @@ def main(args):
             i, f = q.get()
             fname = os.path.splitext(f)[0]
             if args.transformation < 3:
-                img = Image.open(os.path.join(args.image_dir, f))
                 out_file = os.path.join(args.output_image_dir, fname + '.' + args.output_type)
+                if args.resize299 != 0:
+                    img = scipy.misc.imread(os.path.join(args.image_dir, f)).astype(dtype=np.float32)
+                    img = scipy.misc.imresize(img, (299, 299))
+                    scipy.misc.imsave(out_file, img)
+                    img = Image.open(out_file)
+                else:
+                    img = Image.open(os.path.join(args.image_dir, f))
                 if args.transformation == 1:
                     ow, oh = img.size
                     if alpha >= 0:
@@ -57,7 +63,7 @@ def main(args):
                 if args.transformation == 3:
                     for i in range(1, times + 1):
                         out_file = os.path.join(args.output_image_dir, fname + '_' + str(i) + '.' + args.output_type)
-                        img2 = (skimage.util.random_noise(img, mode='gaussian', clip=True, var=(float(alpha) / 255) ** 2) + 1) / 2 * 255
+                        img2 = (skimage.util.random_noise(img, mode='gaussian', clip=True, var=(float(alpha) / 255 * 2) ** 2) + 1) / 2 * 255
                         scipy.misc.imsave(out_file, img2.astype(dtype=np.int))
                 elif args.transformation == 4:
                     for i in range(1, times + 1):
@@ -90,6 +96,7 @@ if __name__ == '__main__':
     #Output Settings
     parser.add_argument('--output_image_dir', help='Directory to output transformed images')
     parser.add_argument('--output_type', default='jpg', help='File type to output')
+    parser.add_argument('--resize299', default=0, help='Whether to resize the picture to 299 * 299')
 
     #Option Settings
     parser.add_argument('--num_workers', default=10, help='Number of threads', type=int)
